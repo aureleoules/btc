@@ -7,6 +7,7 @@ import (
 
 	"github.com/aureleoules/ecdsa"
 	"github.com/mr-tron/base58"
+	"golang.org/x/crypto/ripemd160"
 )
 
 var secp256k1 ecdsa.Curve
@@ -76,4 +77,97 @@ func GeneratePrivateKey() *PrivateKey {
 
 	privateKey.WIF = wif
 	return &privateKey
+}
+
+// GetPublicKey returns the public key of a private key
+func (p *PrivateKey) GetPublicKey() (*PublicKey, bool) {
+	var publicKey PublicKey
+
+	R, valid := secp256k1.ScalarMult(p.Key, secp256k1.G)
+	if !valid {
+		return nil, false
+	}
+	publicKey.X = R.X
+	publicKey.Y = R.Y
+
+	return &publicKey, true
+}
+
+// Hex returns the public key in hex
+func (p *PublicKey) Hex(compressed bool) string {
+	key := ""
+	if !compressed {
+		key += "04"
+
+		key += bigIntToHex(p.X)
+		key += bigIntToHex(p.Y)
+	} else {
+		if p.Y.Bit(0) == 0 { /* Even */
+			key += "02"
+		} else {
+			key += "03"
+		}
+		key += bigIntToHex(p.X)
+	}
+	return key
+}
+
+// Address computes the base58 public address
+func (p *PublicKey) Address(compressed bool, networkByte string) (string, error) {
+	hexa := p.Hex(compressed)
+	bytes, err := hex.DecodeString(hexa)
+	if err != nil {
+		return "", err
+	}
+
+	/* First sha256 hashing */
+	sha := sha256.New()
+	sha.Write(bytes)
+	/* Store it in hash */
+	hash := sha.Sum(nil)
+
+	/* Ripemd hash of the sha256 hash */
+	ripemd := ripemd160.New()
+	ripemd.Write(hash)
+	/* Store it in ripemdHash */
+	ripemdHash := ripemd.Sum(nil)
+
+	/* Convert ripemdHash to hex */
+	hexa = hex.EncodeToString(ripemdHash)
+	/* Add network byte */
+	extendedRipemd := networkByte + hexa
+
+	/* Perform sha256 hash on the ripemdHash with the network byte */
+	bytes, err = hex.DecodeString(extendedRipemd)
+	if err != nil {
+		return "", err
+	}
+	sha = sha256.New()
+	sha.Write(bytes)
+	/* Store it in hash */
+	hash = sha.Sum(nil)
+
+	/* Perform another sha256 hash on the previous sha256 hash */
+	sha = sha256.New()
+	sha.Write(hash)
+	/* Store it in hash */
+	hash = sha.Sum(nil)
+
+	/* Convert double hash to hex */
+	hexa = hex.EncodeToString(hash)
+
+	/* Get checksum (4 first bytes of double hash) */
+	checksum := hexa[0:8]
+
+	/* Add to end of extendedRipemd*/
+	extendedRipemd += checksum
+
+	/* Convert to []byte */
+	extendedRipeMd, err := hex.DecodeString(extendedRipemd)
+	if err != nil {
+		return "", err
+	}
+
+	/* Encode to base 58 */
+	return base58.Encode(extendedRipeMd), nil
 }
