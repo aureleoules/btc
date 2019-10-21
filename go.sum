@@ -1,0 +1,4 @@
+github.com/aureleoules/ecdsa v0.0.0-20191019230712-a735f8080392 h1:NKUfDtuDFd7xexlics7X0rQV0UhASC1BPRucVoFcYxo=
+github.com/aureleoules/ecdsa v0.0.0-20191019230712-a735f8080392/go.mod h1:lfTRYj05RU4JtO7FucJK9vcSrYaX1gR8yXucUVBz37o=
+github.com/mr-tron/base58 v1.1.2 h1:ZEw4I2EgPKDJ2iEw0cNmLB3ROrEmkOtXIkaG7wZg+78=
+github.com/mr-tron/base58 v1.1.2/go.mod h1:BinMc/sQntlIE1frQmRFPUoPA1Zkr8VRgBdjWI2mNwc=
