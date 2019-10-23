@@ -3,6 +3,7 @@ package btc
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"log"
 	"math/big"
 
@@ -39,6 +40,62 @@ func init() {
 		PrivKeyPrefix:    "EF",
 		PubKeyHashPrefix: "6F",
 	}
+}
+
+// CheckWIF checks if the wif checksum is valid
+func CheckWIF(wif string) bool {
+	bytes, err := base58.Decode(wif)
+	if err != nil {
+		return false
+	}
+
+	hexa := hex.EncodeToString(bytes)
+	checksum := hexa[len(hexa)-8 : len(hexa)]
+	hexa = hexa[0 : len(hexa)-8]
+
+	hexBytes, err := hex.DecodeString(hexa)
+	if err != nil {
+		return false
+	}
+
+	sha := sha256.New()
+	sha.Write(hexBytes)
+	hash := sha.Sum(nil)
+
+	sha = sha256.New()
+	sha.Write(hash)
+	hash2 := sha.Sum(nil)
+
+	hash2Hex := hex.EncodeToString(hash2)
+
+	log.Println(hash2Hex, checksum)
+	return hash2Hex[0:8] == checksum
+}
+
+// FromWIF imports a private key from its base58 address
+func FromWIF(wif string, network *Network) (*PrivateKey, error) {
+
+	valid := CheckWIF(wif)
+	if !valid {
+		return nil, errors.New("wif invalid")
+	}
+
+	bytes, err := base58.Decode(wif)
+	if err != nil {
+		return nil, err
+	}
+
+	hexa := hex.EncodeToString(bytes)
+
+	hexa = hexa[2:len(hexa)]
+	hexa = hexa[0 : len(hexa)-8]
+
+	var privateKey PrivateKey
+	privateKey.WIF = wif
+	privateKey.Hex = hexa
+	privateKey.Key, _ = new(big.Int).SetString(hexa, 16)
+
+	return &privateKey, nil
 }
 
 // PrivateFromHex imports a private key from its hex value

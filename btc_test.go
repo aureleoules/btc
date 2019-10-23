@@ -1,23 +1,15 @@
 package btc
 
 import (
-	"log"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestMain(t *testing.T) {
+func TestCheckWIF(t *testing.T) {
+	valid := CheckWIF("5KfonmXvbRoQycGJq3YfEEdu8K1zrtJXzejMjuh1rrPjbavb1Uc")
+	assert.Equal(t, valid, true)
 
-	for i := 0; i < 5000; i++ {
-
-		key := GeneratePrivateKey(MainNetwork)
-		log.Println(key)
-		pubKey, ok := key.GetPublicKey()
-		log.Println(pubKey, ok)
-		address, err := pubKey.Address(false)
-		log.Println(address, err)
-		if err != nil {
-			panic(err)
-		}
-	}
-
+	valid = CheckWIF("5KfonmXvbRoQycGJq3YfEEdu8K1zrtJXzejMjuh1rrPjbavb1UC")
+	assert.Equal(t, valid, false)
 }
