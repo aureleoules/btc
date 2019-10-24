@@ -151,7 +151,9 @@ func GeneratePrivateKey(network *Network) *PrivateKey {
 	key := generateRandomBigInt()
 
 	hexa := bigIntToHex(key)
-	log.Println(len(hexa))
+	if len(hexa) != 64 {
+		return GeneratePrivateKey(network)
+	}
 	privateKey, err := PrivateFromHex(hexa, network)
 	if err != nil {
 		return GeneratePrivateKey(network)
