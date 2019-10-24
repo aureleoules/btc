@@ -68,12 +68,11 @@ func CheckWIF(wif string) bool {
 
 	hash2Hex := hex.EncodeToString(hash2)
 
-	log.Println(hash2Hex, checksum)
 	return hash2Hex[0:8] == checksum
 }
 
-// FromWIF imports a private key from its base58 address
-func FromWIF(wif string, network *Network) (*PrivateKey, error) {
+// PrivateFromWIF imports a private key from its base58 address
+func PrivateFromWIF(wif string, network *Network) (*PrivateKey, error) {
 
 	valid := CheckWIF(wif)
 	if !valid {
@@ -163,6 +162,28 @@ func GeneratePrivateKey(network *Network) *PrivateKey {
 	return privateKey
 }
 
+// PublicFromHex imports a public key from its hex value
+func PublicFromHex(hexa string, network Network) (*PublicKey, error) {
+	// log.Println(len(hexa), hexa)
+	if len(hexa) != 130 {
+		log.Println(hexa)
+	}
+	if hexa[0:2] == "04" {
+		/* Uncompressed */
+		x := hexa[2:66]
+		y := hexa[66:130]
+		log.Println("Uncompressed", x, y)
+	} else if hexa[0:2] == "03" {
+		// x := hexa[2:66]
+		/* Compressed odd */
+	} else if hexa[0:2] == "02" {
+		// y := hexa[2:66]
+		/* Compressed even */
+
+	}
+	return nil, nil
+}
+
 // GetPublicKey returns the public key of a private key
 func (p *PrivateKey) GetPublicKey() (*PublicKey, bool) {
 	var publicKey PublicKey
@@ -185,11 +206,13 @@ func (p *PublicKey) Hex(compressed bool) string {
 
 	/* If hex length is not even, make it even by placing a 0 before */
 	pXHex := bigIntToHex(p.X)
-	if len(pXHex)%2 != 0 {
+	pYHex := bigIntToHex(p.Y)
+
+	/* Add 0's until hex is 64 or 32 bytes long whether key is compressed or not */
+	for len(pXHex) != 64 {
 		pXHex = "0" + pXHex
 	}
-	pYHex := bigIntToHex(p.Y)
-	if len(pYHex)%2 != 0 {
+	for len(pYHex) != 64 {
 		pYHex = "0" + pYHex
 	}
 
@@ -272,3 +295,46 @@ func (p *PublicKey) Address(compressed bool) (string, error) {
 	/* Encode to base 58 */
 	return base58.Encode(extendedRipeMd), nil
 }
+
+// AddPrivateKeys merge two private keys together by addition
+func AddPrivateKeys(p1 *PrivateKey, p2 *PrivateKey, network *Network) (*PrivateKey, error) {
+
+	pKey := new(big.Int)
+	pKey = pKey.Add(p1.Key, p2.Key)
+	pKey = pKey.Mod(pKey, secp256k1.N)
+
+	hexa := bigIntToHex(pKey)
+
+	privateKey, err := PrivateFromHex(hexa, network)
+	return privateKey, err
+}
+
+// MultiplyPrivateKeys merge two private keys together by multiplication
+func MultiplyPrivateKeys(p1 *PrivateKey, p2 *PrivateKey, network *Network) (*PrivateKey, error) {
+
+	pKey := new(big.Int)
+	pKey = pKey.Mul(p1.Key, p2.Key)
+	pKey = pKey.Mod(pKey, secp256k1.N)
+
+	hexa := bigIntToHex(pKey)
+
+	privateKey, err := PrivateFromHex(hexa, network)
+	return privateKey, err
+}
+
+// AddPublicKeys merge two public keys together by addition
+// func AddPublicKeys(p1 *PublicKey, p2 *PublicKey, compressed bool, network *Network) (*PublicKey, error) {
+
+// 	p1Big, _ := new(big.Int).SetString(p1.Hex(compressed), 16)
+// 	p2Big, _ := new(big.Int).SetString(p2.Hex(compressed), 16)
+
+// 	pKey := new(big.Int)
+// 	pKey = pKey.Add(p1Big, p2Big)
+// 	pKey = pKey.Mod(pKey, secp256k1.N)
+
+// 	hexa := bigIntToHex(pKey)
+
+// 	publicKey := PublicKey{}
+
+// 	return privateKey, err
+// }

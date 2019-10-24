@@ -18,9 +18,40 @@ func TestCheckWIF(t *testing.T) {
 func TestGenerateKey(t *testing.T) {
 	for i := 0; i < 5000; i++ {
 		key := GeneratePrivateKey(MainNetwork)
-		if len(key.WIF) != 51 {
-			log.Println(key.WIF)
-			log.Println("HEX", key.Hex)
+		assert.Equal(t, true, len(key.WIF) == 51)
+	}
+}
+
+func TestAddPrivateKeys(t *testing.T) {
+	// key1 := GeneratePrivateKey(MainNetwork)
+	// key2 := GeneratePrivateKey(MainNetwork)
+
+	key1, _ := PrivateFromWIF("5KEurfmUXeJQM2Ao636USLyeB7H5mwz8EB4ABUzF5iFdNzTBne2", MainNetwork)
+	key2, _ := PrivateFromWIF("5K8VA8kmG1VHKPjKtxcHW5tDk53BovDT8twmqnfQaa51dSuqd5d", MainNetwork)
+
+	key, err := AddPrivateKeys(key1, key2, MainNetwork)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(key)
+
+	key, err = MultiplyPrivateKeys(key1, key2, MainNetwork)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(key)
+}
+
+func TestGetPublicKey(t *testing.T) {
+	for i := 0; i < 5000; i++ {
+		key := GeneratePrivateKey(MainNetwork)
+		pub, valid := key.GetPublicKey()
+		if !valid {
+			log.Fatal(pub)
 		}
+
+		hexa := pub.Hex(false)
+		PublicFromHex(hexa, *MainNetwork)
+		// log.Println(pub.Hex(true))
 	}
 }
