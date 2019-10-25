@@ -1,6 +1,6 @@
 module github.com/aureleoules/btc
 
-go 1.13
+go 1.12
 
 require (
 	github.com/aureleoules/ecdsa v0.0.0-20191021220258-b559fa2a83d4

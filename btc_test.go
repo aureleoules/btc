@@ -39,19 +39,30 @@ func TestAddPrivateKeys(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(key)
+	// log.Println(key)
+}
+
+func TestPublicFromHex(t *testing.T) {
+	pKey, err := PublicFromHex("02d0431b1fb23bf0d4d9b95b26419cba50409d0fa610e9274b2f418bdca20d42e5", MainNetwork)
+	log.Println(pKey, err)
+	log.Println("compressed", pKey.Hex(false))
 }
 
 func TestGetPublicKey(t *testing.T) {
-	for i := 0; i < 5000; i++ {
+	for i := 0; i < 100; i++ {
 		key := GeneratePrivateKey(MainNetwork)
 		pub, valid := key.GetPublicKey()
 		if !valid {
 			log.Fatal(pub)
 		}
 
-		hexa := pub.Hex(false)
-		PublicFromHex(hexa, *MainNetwork)
+		hexa := pub.Hex(true)
+		if hexa[0:2] == "02" {
+			// log.Println(hexa)
+			// log.Println(key)
+
+		}
+		PublicFromHex(hexa, MainNetwork)
 		// log.Println(pub.Hex(true))
 	}
 }
