@@ -60,6 +60,7 @@ func PrivateFromWIF(wif string, network *Network) (*PrivateKey, error) {
 	privateKey.WIF = wif
 	privateKey.Hex = hexa
 	privateKey.Key, _ = new(big.Int).SetString(hexa, 16)
+	privateKey.Network = network
 
 	return &privateKey, nil
 }

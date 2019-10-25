@@ -1,3 +1,5 @@
+github.com/ThePiachu/Go v0.0.0-20170313014101-8b651fe0bd59 h1:bLPT+D6zP3KNm+B/XVqSGt4aNShF879sgTdlEFfIWms=
+github.com/ThePiachu/Go v0.0.0-20170313014101-8b651fe0bd59/go.mod h1:z0U0rgaY5pELUgamSvQahuyDpe+MbL6rt51rRGor6f4=
 github.com/aureleoules/ecdsa v0.0.0-20191021220258-b559fa2a83d4 h1:ghrhi5fdO1k/GD/Sz8s0b/xKWg7mj/fzfbOLBetEeng=
 github.com/aureleoules/ecdsa v0.0.0-20191021220258-b559fa2a83d4/go.mod h1:w3Zxo2m3450nu17VPOi3lKQb2h5QGbTTf4KV0lxhH/s=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=

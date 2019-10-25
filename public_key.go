@@ -4,16 +4,17 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"log"
 	"math/big"
+	"reflect"
 
-	"github.com/ThePiachu/Go/mymath/ripemd160"
+	"github.com/aureleoules/ecdsa"
+	"golang.org/x/crypto/ripemd160"
+
 	"github.com/mr-tron/base58"
 )
 
 // PublicFromHex imports a public key from its hex value
 func PublicFromHex(hexa string, network *Network) (*PublicKey, error) {
-	// log.Println(len(hexa), hexa)
 	var publicKey PublicKey
 	publicKey.Network = network
 
@@ -71,8 +72,8 @@ func (p *PrivateKey) GetPublicKey() (*PublicKey, bool) {
 	return &publicKey, true
 }
 
-// Hex returns the public key in hex
-func (p *PublicKey) Hex(compressed bool) string {
+// Format returns the public key in hex
+func (p *PublicKey) Format(compressed bool) string {
 	key := ""
 
 	/* If hex length is not even, make it even by placing a 0 before */
@@ -98,7 +99,6 @@ func (p *PublicKey) Hex(compressed bool) string {
 		} else {
 			key += "03"
 		}
-
 		key += pXHex
 	}
 	return key
@@ -106,12 +106,9 @@ func (p *PublicKey) Hex(compressed bool) string {
 
 // Address computes the base58 public address
 func (p *PublicKey) Address(compressed bool) (string, error) {
-	hexa := p.Hex(compressed)
+	hexa := p.Format(compressed)
 	bytes, err := hex.DecodeString(hexa)
-	log.Println(len(hexa))
-	log.Println(hexa)
 	if err != nil {
-		log.Println("ERROR")
 		return "", err
 	}
 
@@ -165,4 +162,33 @@ func (p *PublicKey) Address(compressed bool) (string, error) {
 
 	/* Encode to base 58 */
 	return base58.Encode(extendedRipeMd), nil
+}
+
+// AddPublicKeys merge two public keys together by addition
+func AddPublicKeys(p1 *PublicKey, p2 *PublicKey, compressed bool) (*PublicKey, error) {
+
+	if !reflect.DeepEqual(p1.Network, p2.Network) {
+		return nil, errors.New("different network")
+	}
+
+	point1 := ecdsa.Point{
+		X: p1.X,
+		Y: p1.Y,
+	}
+	point2 := ecdsa.Point{
+		X: p2.X,
+		Y: p2.Y,
+	}
+
+	r, onCurve := secp256k1.AddPoints(point1, point2)
+	if !onCurve {
+		return nil, errors.New("point is not on curve")
+	}
+	publicKey := PublicKey{
+		X:       r.X,
+		Y:       r.Y,
+		Network: p1.Network,
+	}
+
+	return &publicKey, nil
 }

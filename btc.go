@@ -35,20 +35,3 @@ func init() {
 		PubKeyHashPrefix: "6F",
 	}
 }
-
-// AddPublicKeys merge two public keys together by addition
-// func AddPublicKeys(p1 *PublicKey, p2 *PublicKey, compressed bool, network *Network) (*PublicKey, error) {
-
-// 	p1Big, _ := new(big.Int).SetString(p1.Hex(compressed), 16)
-// 	p2Big, _ := new(big.Int).SetString(p2.Hex(compressed), 16)
-
-// 	pKey := new(big.Int)
-// 	pKey = pKey.Add(p1Big, p2Big)
-// 	pKey = pKey.Mod(pKey, secp256k1.N)
-
-// 	hexa := bigIntToHex(pKey)
-
-// 	publicKey := PublicKey{}
-
-// 	return privateKey, err
-// }
