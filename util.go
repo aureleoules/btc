@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"unsafe"
 )
 
 func generateRandomBigInt() *big.Int {
@@ -19,11 +18,4 @@ func generateRandomBigInt() *big.Int {
 
 func bigIntToHex(n *big.Int) string {
 	return fmt.Sprintf("%x", n)
-}
-
-func byte32(s []byte) (a *[32]byte) {
-	if len(a) <= len(s) {
-		a = (*[len(a)]byte)(unsafe.Pointer(&s[0]))
-	}
-	return a
 }
