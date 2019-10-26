@@ -191,5 +191,126 @@ func TestWIF(t *testing.T) {
 	for _, wif := range wifArray {
 		assert.Equal(t, false, CheckWIF(wif))
 	}
+}
+
+func TestAddPrivateKeys(t *testing.T) {
+
+	var wifArray = []struct {
+		WIF1   string
+		WIF2   string
+		WIFSUM string
+	}{
+		{"5Jw5VXRjdyojUobJQ96Psr8zmXZKHsjYgpLXf536ozN6uLZpNDD", "5KdoUDYDYSYQbC4oyjTszeeEBhjydEsJpdM9v1ziTFAkEeR2oBb", "5JorCq4qFY6vgAh8S6VNq8SQMPDZbJ9gThonMd1VizhCF5RMhSG"},
+		{"5JBxKUAFL9526rQcTYAoJcFw4QLYPRHWXmRKVX88jafJLfyTqVE", "5KG564bEsdu4WrDtcUNKRVuhA9JXeJvXCFnXDFEL1xvzMdDMAx1", "5KdjprJQ8KQ6MhFE2p6De4RVzwp9pbLx1D94UbJiWfjeXdu6qkw"},
+		{"5J4DJXZTvS6VfzP9bMvfkUzX9HurnZN7G5LjXEvM6TmBherbgN7", "5KGiw1sox8jKZbCzjaTBXKYXBJsMzd5MdZbdbNctebitNJs8daW", "5KWeerzBo7FpyaCsHjvxBknv6zxJa3aPApsatSVVWBdRuNC5tMg"},
+	}
+
+	for _, key := range wifArray {
+		p1, err := PrivateFromWIF(key.WIF1, MainNetwork)
+		assert.Nil(t, err)
+		p2, err := PrivateFromWIF(key.WIF2, MainNetwork)
+		assert.Nil(t, err)
+
+		privateKey, err := AddPrivateKeys(p1, p2)
+		assert.Nil(t, err)
+		assert.Equal(t, key.WIFSUM, privateKey.WIF)
+	}
+
+	/* different network */
+	p1, _ := PrivateFromWIF("937dTvv4mUCZFbHqaom9uPUAFhNPTVdeWZ454xKUiywubknhRV7", TestNetwork)
+	p2, _ := PrivateFromWIF("5J4DJXZTvS6VfzP9bMvfkUzX9HurnZN7G5LjXEvM6TmBherbgN7", MainNetwork)
+
+	_, err := AddPrivateKeys(p1, p2)
+	assert.NotNil(t, err)
+
+	/* Cannot add two same keys */
+	p1, _ = PrivateFromWIF("5Jw5VXRjdyojUobJQ96Psr8zmXZKHsjYgpLXf536ozN6uLZpNDD", MainNetwork)
+	p2, _ = PrivateFromWIF("5Jw5VXRjdyojUobJQ96Psr8zmXZKHsjYgpLXf536ozN6uLZpNDD", MainNetwork)
+
+	_, err = AddPrivateKeys(p1, p2)
+	assert.NotNil(t, err)
+
+	/* Test network */
+	wifArray = []struct {
+		WIF1   string
+		WIF2   string
+		WIFSUM string
+	}{
+		{"931krx7yFnVSoHb1JxeN1W2rrhWARbNfiK3BA3xVZZrfgALvkMy", "92iDRThnHRquXbFLgZVdYzFjVUYz8difQtwjeMRRULKNbxNWkKV", "92CJwm76271zxzN5RQBBeXPp6fci5F6xjXF4WK169vbLcAqsJnz"},
+		{"92iDRThnHRquXbFLgZVdYzFjVUYz8difQtwjeMRRULKNbxNWkKV", "91nnQwn6kyNo56s2umtUBoUbuB9FyU8vuQzQjG4ZfFKV354kAwt", "92v5fzDFNiaaNdDovo3Hn9SFXPWcjoTKFZ1R4p5jYy3AhGrZysb"},
+		{"92H2Z5s2Mwy3XTJTmeRdc4q75suMonU1jqow36yqe5UQcZvLxu7", "91imyYBEzyfb2d45tX81JucjFsCvidtKYwxbZXP6f431rY1mV8E", "92QtNCmdhEzWL1TyzdCpxL9kUUvfA7x4E2qoHpxgiWujXLJhgo1"},
+	}
+
+	for _, key := range wifArray {
+		p1, err := PrivateFromWIF(key.WIF1, TestNetwork)
+		assert.Nil(t, err)
+		p2, err := PrivateFromWIF(key.WIF2, TestNetwork)
+		assert.Nil(t, err)
+
+		privateKey, err := AddPrivateKeys(p1, p2)
+		assert.Nil(t, err)
+		assert.Equal(t, key.WIFSUM, privateKey.WIF)
+	}
+
+}
+
+func TestMultiplyPrivateKeys(t *testing.T) {
+
+	var wifArray = []struct {
+		WIF1   string
+		WIF2   string
+		WIFSUM string
+	}{
+		{"5Jw5VXRjdyojUobJQ96Psr8zmXZKHsjYgpLXf536ozN6uLZpNDD", "5KdoUDYDYSYQbC4oyjTszeeEBhjydEsJpdM9v1ziTFAkEeR2oBb", "5J9ySojosxzdVS4JFiPeWUpcUqb6T5EwobxZKaxXkD1w4TGR6wm"},
+		{"5JBxKUAFL9526rQcTYAoJcFw4QLYPRHWXmRKVX88jafJLfyTqVE", "5KG564bEsdu4WrDtcUNKRVuhA9JXeJvXCFnXDFEL1xvzMdDMAx1", "5JApih4xtEmPzQHqWSbWG1Ev3SWKX7cbNRhqnwPG4NsUiUGkHkN"},
+		{"5J4DJXZTvS6VfzP9bMvfkUzX9HurnZN7G5LjXEvM6TmBherbgN7", "5KGiw1sox8jKZbCzjaTBXKYXBJsMzd5MdZbdbNctebitNJs8daW", "5Jk6N33DfNusZSQk6puyg2mutWFrdHMEmLKY1wfNH9Nvr3hBycZ"},
+	}
+
+	for _, key := range wifArray {
+		p1, err := PrivateFromWIF(key.WIF1, MainNetwork)
+		assert.Nil(t, err)
+		p2, err := PrivateFromWIF(key.WIF2, MainNetwork)
+		assert.Nil(t, err)
+
+		privateKey, err := MultiplyPrivateKeys(p1, p2)
+		assert.Nil(t, err)
+		assert.Equal(t, key.WIFSUM, privateKey.WIF)
+	}
+
+	/* different network */
+	p1, _ := PrivateFromWIF("937dTvv4mUCZFbHqaom9uPUAFhNPTVdeWZ454xKUiywubknhRV7", TestNetwork)
+	p2, _ := PrivateFromWIF("5J4DJXZTvS6VfzP9bMvfkUzX9HurnZN7G5LjXEvM6TmBherbgN7", MainNetwork)
+
+	_, err := MultiplyPrivateKeys(p1, p2)
+	assert.NotNil(t, err)
+
+	/* Cannot add two same keys */
+	p1, _ = PrivateFromWIF("5Jw5VXRjdyojUobJQ96Psr8zmXZKHsjYgpLXf536ozN6uLZpNDD", MainNetwork)
+	p2, _ = PrivateFromWIF("5Jw5VXRjdyojUobJQ96Psr8zmXZKHsjYgpLXf536ozN6uLZpNDD", MainNetwork)
+
+	_, err = AddPrivateKeys(p1, p2)
+	assert.NotNil(t, err)
+
+	/* Test network */
+	wifArray = []struct {
+		WIF1   string
+		WIF2   string
+		WIFSUM string
+	}{
+		{"931krx7yFnVSoHb1JxeN1W2rrhWARbNfiK3BA3xVZZrfgALvkMy", "92iDRThnHRquXbFLgZVdYzFjVUYz8difQtwjeMRRULKNbxNWkKV", "93EZpcjYBGSUyracS6r2S7zuies3L5JTaA3aWq8e7MuzEsgJN79"},
+		{"92iDRThnHRquXbFLgZVdYzFjVUYz8difQtwjeMRRULKNbxNWkKV", "91nnQwn6kyNo56s2umtUBoUbuB9FyU8vuQzQjG4ZfFKV354kAwt", "93QbCK1yjymCNzriUM6G5bfqetCGz1Ffm8cyE71N1gQhXRUhqpK"},
+		{"92H2Z5s2Mwy3XTJTmeRdc4q75suMonU1jqow36yqe5UQcZvLxu7", "91imyYBEzyfb2d45tX81JucjFsCvidtKYwxbZXP6f431rY1mV8E", "91oqEbrxXNoT658oKbMau5zjmR8YDKdajFMFrC6cLixxSgXxmZV"},
+	}
+
+	for _, key := range wifArray {
+		p1, err := PrivateFromWIF(key.WIF1, TestNetwork)
+		assert.Nil(t, err)
+		p2, err := PrivateFromWIF(key.WIF2, TestNetwork)
+		assert.Nil(t, err)
+
+		privateKey, err := MultiplyPrivateKeys(p1, p2)
+		assert.Nil(t, err)
+		assert.Equal(t, key.WIFSUM, privateKey.WIF)
+	}
 
 }

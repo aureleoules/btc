@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"math/big"
+	"reflect"
+	"strings"
 
 	"github.com/mr-tron/base58"
 )
@@ -131,7 +133,15 @@ func GeneratePrivateKey(network *Network) *PrivateKey {
 }
 
 // AddPrivateKeys merge two private keys together by addition
-func AddPrivateKeys(p1 *PrivateKey, p2 *PrivateKey, network *Network) (*PrivateKey, error) {
+func AddPrivateKeys(p1 *PrivateKey, p2 *PrivateKey) (*PrivateKey, error) {
+
+	if !reflect.DeepEqual(p1.Network, p2.Network) {
+		return nil, errors.New("different network")
+	}
+
+	if strings.ToLower(p1.WIF) == strings.ToLower(p2.WIF) {
+		return nil, errors.New("private keys are identical")
+	}
 
 	pKey := new(big.Int)
 	pKey = pKey.Add(p1.Key, p2.Key)
@@ -139,12 +149,20 @@ func AddPrivateKeys(p1 *PrivateKey, p2 *PrivateKey, network *Network) (*PrivateK
 
 	hexa := bigIntToHex(pKey)
 
-	privateKey, err := PrivateFromHex(hexa, network)
+	privateKey, err := PrivateFromHex(hexa, p1.Network)
 	return privateKey, err
 }
 
 // MultiplyPrivateKeys merge two private keys together by multiplication
-func MultiplyPrivateKeys(p1 *PrivateKey, p2 *PrivateKey, network *Network) (*PrivateKey, error) {
+func MultiplyPrivateKeys(p1 *PrivateKey, p2 *PrivateKey) (*PrivateKey, error) {
+
+	if !reflect.DeepEqual(p1.Network, p2.Network) {
+		return nil, errors.New("different network")
+	}
+
+	if strings.ToLower(p1.WIF) == strings.ToLower(p2.WIF) {
+		return nil, errors.New("private keys are identical")
+	}
 
 	pKey := new(big.Int)
 	pKey = pKey.Mul(p1.Key, p2.Key)
@@ -152,6 +170,6 @@ func MultiplyPrivateKeys(p1 *PrivateKey, p2 *PrivateKey, network *Network) (*Pri
 
 	hexa := bigIntToHex(pKey)
 
-	privateKey, err := PrivateFromHex(hexa, network)
+	privateKey, err := PrivateFromHex(hexa, p1.Network)
 	return privateKey, err
 }
