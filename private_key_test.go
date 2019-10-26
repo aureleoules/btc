@@ -120,3 +120,76 @@ func TestPrivateFromWIF(t *testing.T) {
 	_, err = PrivateFromWIF("5K9uGdHuajFab23DZFCv3EBN2bRwkifZiZRNbUoUgyn9g8UFMT", MainNetwork)
 	assert.NotNil(t, err)
 }
+
+func TestWIF(t *testing.T) {
+	wifArray := []string{
+		"5Jw5VXRjdyojUobJQ96Psr8zmXZKHsjYgpLXf536ozN6uLZpNDD",
+		"5KdoUDYDYSYQbC4oyjTszeeEBhjydEsJpdM9v1ziTFAkEeR2oBb",
+		"5KctWoGYRZBYsXeiBJQJoJwtoSPMB4CF97K7LgMsHhHuUphUcQc",
+		"5K8z81Wdq6L5ZRcFdQMpgnvaQQc8pesRLybsf5dCSKgFeeb2wRC",
+		"5Kjc8GtRf22XKXFkxCZzCdjpuXrqw8u7sxkWUBkT7KeiRBBTVps",
+		"5JLk1eZM6MMSfji4DhHgbHTcEzRQw5rNB85E1nF8TwsYfZhwDVe",
+		"5JmvnCKj4PthjAJ3LAaPK7xoMah6mRMLB3tqQmZqioSYcDaDgVL",
+		"5JCTBTAkMm1fqJaYNBtorJjPQtCK19Leh6DhsmbnraRNBuMG31B",
+		"5J5HCukSWeQKnhmthv4nS4FMvbuvek1iqiLbXbemJCZDBd5jPF8",
+		"5JveaFJBvAoJoMHTjFb6voQYi6xdECpjzUd7av6UFuAr3Zer7tv",
+		"5HyA68w1SbNiX23Wex9qLMcvA68sYsXiDajSsBjW48gTS4cvCZ9",
+		"5JP3yj2MozTDzHSkfYbcsooCTjpxCL298pPvkdx3WCMknKmqqm4",
+		"5JgEeMNEHQG36txKhC7as54sTZRnr2burSBGBsmn3wE8jiWY4UX",
+		"5Jttm9vDkXKYZBgrmPraGoHGtMcsrzgJqUJAk7a6vGvp2iqu1qG",
+		"5JLot2SubTSJtEpyWUmnGqgbYVMDNdTBdBzPKaMfSoa1F21eeDt",
+		"5K75MjFaxqJQYQvr5yH4nT3MVMjHQ3eBDChWYJ4D6WGMgXnoxCL",
+		"5JBxKUAFL9526rQcTYAoJcFw4QLYPRHWXmRKVX88jafJLfyTqVE",
+		"5JGed5wMstzeiqseHXHD5C8fnoqcaYSWwFbxS5HbTETRnof32qM",
+		"5Kg2qaL7S59XsQtqzf34mfernQQw5DUQ2Y2b8p3dtbcF6Ehwb7M",
+		"5JyvFPg5NqRT3r51S9GYnNi13PZ44LNg6uN8XTCLudeUiENvvkV",
+		"5J4DJXZTvS6VfzP9bMvfkUzX9HurnZN7G5LjXEvM6TmBherbgN7",
+		"5KG564bEsdu4WrDtcUNKRVuhA9JXeJvXCFnXDFEL1xvzMdDMAx1",
+		"5KVYHbZTRZbBHt4yWw8sn9Yrhxxbc8om68eFrwKd1uduVxnUtgK",
+		"5KQ4KAJLKxnsmaowc5ot2ECsnBLjAfNfiipSeKnfw2QWSdvvwoK",
+		"5KYG6ERJ62xGYCoBuuyiiLMQ3DYKehbEwBd4qXVrLD97FZe3HT6",
+		"5JTxsCNXXbDqPq1QZvExrzWKG8Ls1zdQju8ieENmoTLhiM54KLh",
+		"5K2VyPeSMZaE9VbWoLcjh9J5svc4r9nq1QpsjhMpQvvY7WsbtvP",
+		"5JzVoGtMKCZAGaZmwFPQrVwexYVDpPSbLKUavaXgHxnRRXa252e",
+		"5KhNa3UoBEVJZmwyDMKp4Wc4afmEYyGsBUzfWbyohyvQLEfxg5m",
+		"5KGiw1sox8jKZbCzjaTBXKYXBJsMzd5MdZbdbNctebitNJs8daW",
+		"5K3zrYZRvAUCfsE7KzRNwhowSe9t5DMVxir5N1Gw9bJqsUfU7Pr",
+		"5KDuhcNgSumqwhagVZfPAgqfS9BcJJKXkhsiFyovvgd83jXsGX4",
+		"5KCQDfiRAqowdXjbS81CC47ADY8mobh4mnSUZXaMcpmLMBZwCYX",
+		"5KUzEjAKf5uZ5vvsTPxF5sVDsAhFZe1vAEaSuHv1rGpxPpXLXYf",
+		"5K9iSbKSRUCQqbban5tGwooH9LbgybDURgB9KBPca7hwJMnSbo8",
+		"5JrVLx8gEKbqHKKiP3S2KwbtASwrWvj2N7ztyNbhLyiK11EpWQB",
+		"5KCAByRFMj5Ji3NtYhuR7dB8Z1GfaEyij89KgYzVdqU4ZK5VpkC",
+		"5JGPBGfCfgWFTzgpVZBjzGQ8nGod3gYumWooheFZN3e4sL87z4w",
+		"5JDCwx2jmaUBbyb2rtnNm5bSwDQ2E4oSCupcivAFkWDsK8L5b3X",
+		"5J2u7HgEHvPfgKWemYVcKSxopYqRUPfhQbpVe1Ac429kGnmFgnq",
+		"5K1YCjna7PM1Q9rZCaWRhn3PZUXkxWDWEhfZdX2K9bMnkKJkZiU",
+	}
+
+	for _, wif := range wifArray {
+		assert.Equal(t, true, CheckWIF(wif))
+	}
+
+	/* Incorrect wif */
+	wifArray = []string{
+		"5Jw5VXRjdyojUobJQ9Psr8zmXZKHsjYgpLXf536ozN6uLZpNDD",
+		"5KdoUDYDYSYQbC4oyjTzeeEBhjydEsJpdM9v1ziTFAkEeR2oBb",
+		"5KctWoGYRZBYsXeiBJQJJwtoSPMB4CF97K7LgMsHhHuUphUcQc",
+		"5K8z81Wdq6L5ZRcFdQpgnvaQQc8pesRLybsf5dCSKgFeeb2wRC",
+		"5Kjc8GtRf22XKXFkxCZzCjpuXrqw8u7sxkWUBkT7KeiRBBTVps",
+		"5JLk1eZM6MMSfji4DhHgbHTcEzRQw5rNB85E1nF8TwsYfhwDVe",
+		"5JmvnCKj4PthjAJ3LAPK7xoMah6mRMLB3tqQmZqioSYcDaDgVL",
+		"5JCTBTAkMm1fqJaYNBorjPQtCK19Leh6DhsmbnraRNBuMG31B",
+		"5J5HCukSWeQKnhmthv4nFMvbuvek1iqiLbXbemJCZDBd5jPF8",
+		"5JveaFJBvAoJoMHTjFb6vQYi6xdECpjzUd7av6UFuAr3Zer7tv",
+		"5HyA68w1SbNiX23Wex9qLMvA68sYsXiDajSsBjW48gTS4cvCZ9",
+		"5JP3yj2MozTDzHSkfYbcsooTjpxCL298pPvkdx3WCMknKmqqm4",
+		"5JgEeMNEHQG36txKhC7as54sZRnr2burSBGBsmn3wE8jiWY4UX",
+		"Jttm9vDkXKYZBgrmPraGoHGtMcsrzgJqUJAk7a6vGvp2iqu1qG",
+	}
+
+	for _, wif := range wifArray {
+		assert.Equal(t, false, CheckWIF(wif))
+	}
+
+}
